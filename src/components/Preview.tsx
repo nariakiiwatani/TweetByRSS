@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography } from '@mui/material';
 
+function escapeHtml(unsafe: string) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 type PreviewProps = {
 	template: string;
 	rss: any;
@@ -37,6 +46,9 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 			text = text.replace(match, value || '');
 		});
 
+		text = escapeHtml(text);
+		text = text.replace(/\n/g, '<br />');
+
 		const urlMatches = text.match(urlRegex) || [] as string[];
 		const urlLength = urlMatches.reduce((sum, url) => sum + url.length, 0);
 		const url_in_tweet_size = 23;
@@ -50,7 +62,7 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 	<Box sx={{maxWidth:'50vw'}}>
 		<Card variant="outlined">
 			<CardContent>
-				<Typography variant="body1">{text}</Typography>
+				<Typography variant="body1" dangerouslySetInnerHTML={{__html:text}}></Typography>
 			</CardContent>
 		</Card>
 		<Typography variant="caption" color="textSecondary">Twitter投稿時の文字数(たぶん): {charCount}</Typography>
