@@ -12,15 +12,17 @@ import { Box, Paper, Typography } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+import { useTranslation } from './hooks/useTranslation'
+
 const theme = createTheme({
 	palette: {
-		mode: 'light',  // または 'dark'
-		// その他のカスタム設定...
+		mode: 'light',
 	},
-	// その他のカスタム設定...
 });
 
 function App() {
+	const { t } = useTranslation('label')
+
 	const [feed_url, setFeedUrl] = useState(() => localStorage.getItem('feed_url') || '');
 	const [rss, setRSS] = useState<any>(null);
 	const [item_index, setItemIndex] = useState(0)
@@ -36,22 +38,22 @@ function App() {
 			<Header />
 			<Box sx={{ margin: 2 }}>
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
-					<Typography variant="h5" gutterBottom>RSSフィードのURLを入力</Typography>
+					<Typography variant="h5" gutterBottom>{t.input_rss}</Typography>
 					<RSSFeedInput feed_url={feed_url} setFeedUrl={setFeedUrl} onResult={setRSS} />
 				</Paper>
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
-					<Typography variant="h5" gutterBottom>ツイート内容を編集</Typography>
+					<Typography variant="h5" gutterBottom>{t.edit_template}</Typography>
 					<TemplateEditor value={template} rss={rss} onChange={setTemplate} />
 				</Paper>
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
-					<Typography variant="h5" gutterBottom>反映するエピソードを選択</Typography>
+					<Typography variant="h5" gutterBottom>{t.select_episode}</Typography>
 					<SelectItem rss={rss} onChange={setItemIndex} />
 				</Paper>
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
-					<Typography variant="h5" gutterBottom>プレビュー</Typography>
+					<Typography variant="h5" gutterBottom>{t.preview}</Typography>
 					<Preview template={template} rss={rss} item_index={item_index} onChange={setPreviewText} />
 				</Paper>
 

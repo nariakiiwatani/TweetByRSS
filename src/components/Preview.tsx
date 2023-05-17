@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography } from '@mui/material';
+import { useTranslation } from '../hooks/useTranslation'
 
 function escapeHtml(unsafe: string) {
     return unsafe
@@ -18,6 +19,7 @@ type PreviewProps = {
 };
 
 const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }) => {
+	const { t } = useTranslation('preview')
 	const [text, setText] = useState('')
 	const [charCount, setCharCount] = useState(0);
 	const urlRegex = /(https?:\/\/[^\s\u3000-\u30FF\uFF00-\uFFEF]+)/g;
@@ -66,7 +68,7 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 				<Typography variant="body1" dangerouslySetInnerHTML={{__html:text}}></Typography>
 			</CardContent>
 		</Card>
-		<Typography variant="caption" color="textSecondary">Twitter投稿時の文字数(たぶん): {charCount}</Typography>
+		<Typography variant="caption" color="textSecondary">{t.limit}: {charCount}</Typography>
 	</Box>
 	);
 };

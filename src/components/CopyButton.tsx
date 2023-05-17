@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Snackbar, Alert } from '@mui/material';
+import { useTranslation } from '../hooks/useTranslation';
 
 type CopyButtonProps = {
 	value: string;
 };
 
 const CopyButton: React.FC<CopyButtonProps> = ({ value }) => {
+	const { t } = useTranslation('copy')
 	const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'completed' | 'error'>('idle');
 
 	const handleCopy = async () => {
@@ -30,20 +32,20 @@ const CopyButton: React.FC<CopyButtonProps> = ({ value }) => {
 				color='secondary'
 				onClick={handleCopy}
 				disabled={copyStatus === 'copying'}
-			>クリップボードにコピー</Button>
+			>{t.button}</Button>
 			<Snackbar open={copyStatus === 'copying'} autoHideDuration={6000} onClose={handleClose}>
 				<Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
-					Copying to clipboard...
+					{t.pending}
 				</Alert>
 			</Snackbar>
 			<Snackbar open={copyStatus === 'completed'} autoHideDuration={6000} onClose={handleClose}>
 				<Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-					Copied to clipboard!
+					{t.success}
 				</Alert>
 			</Snackbar>
 			<Snackbar open={copyStatus === 'error'} autoHideDuration={6000} onClose={handleClose}>
 				<Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-					Failed to copy text.
+					{t.fail}
 				</Alert>
 			</Snackbar>
 		</div>

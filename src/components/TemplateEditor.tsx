@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TextField, Grid, Typography } from '@mui/material';
 import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { useTranslation } from '../hooks/useTranslation'
 
 type TemplateEditorProps = {
 	value: string;
@@ -9,6 +10,7 @@ type TemplateEditorProps = {
 };
 
 const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss, onChange }) => {
+	const { t } = useTranslation('editor')
 	const [value, setValue] = useState(propsValue);
 	const [elements, setElements] = useState<{ path: string, value: any }[]>([]);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -79,13 +81,13 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 				/>
 			</Grid>
 			<Grid item xs={12} sm={6}>
-				<Typography variant='h6'>RSSから挿入</Typography>
+				<Typography variant='h6'>{t.insert_from_rss}</Typography>
 				<Select
 					onChange={handleSelectChange}
 					value='label'
 					fullWidth
 				>
-					<MenuItem value='label' disabled>--- 番組情報 ---</MenuItem>
+					<MenuItem value='label' disabled>{t.channel}</MenuItem>
 					{elements.filter(e => !e.path.startsWith('item.')).map(option)}
 				</Select>
 				<Select
@@ -93,7 +95,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 					value='label'
 					fullWidth
 				>
-					<MenuItem value='label' disabled>--- エピソード ---</MenuItem>
+					<MenuItem value='label' disabled>{t.episode}</MenuItem>
 					{elements.filter(e => e.path.startsWith('item.')).map(option)}
 				</Select>
 			</Grid>

@@ -1,15 +1,29 @@
-import { AppBar, Toolbar, Typography, IconButton, Link } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Link, Box, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import TwitterIcon from '@mui/icons-material/Twitter';
+import { useTranslation } from '../hooks/useTranslation'
+
 
 const Header = () => {
+	const {locale, changeLanguage} = useTranslation()
+	const handleChangeLanguage = (event: SelectChangeEvent<string>) => {
+		changeLanguage(event.target.value)
+	}
 	return (
 		<AppBar position="static">
 			<Toolbar>
 				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
 					Make Tweet From RSS
 				</Typography>
-				<IconButton color="inherit" component={Link} href="https://github.com/nariakiiwatani/TweetByRSS">
+				<Box>
+					<Select
+						value={locale}
+						onChange={handleChangeLanguage}
+					>
+						<MenuItem value="en">🇺🇸 English</MenuItem>
+						<MenuItem value="ja">🇯🇵 日本語</MenuItem>
+					</Select>
+				</Box>				<IconButton color="inherit" component={Link} href="https://github.com/nariakiiwatani/TweetByRSS">
 					<GitHubIcon />
 				</IconButton>
 				<IconButton color="inherit" component={Link} href="https://twitter.com/nariakiiwatani">
