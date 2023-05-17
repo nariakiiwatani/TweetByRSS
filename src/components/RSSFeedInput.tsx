@@ -1,5 +1,12 @@
 import { useAsync } from 'react-use';
 
+import { XMLParser } from 'fast-xml-parser';
+
+const parser = new XMLParser({
+	attributeNamePrefix: "@",
+	ignoreAttributes: false
+})
+
 interface RSSFeedInputProps {
 	feed_url: string;
 	setFeedUrl: (url: string) => void;
@@ -11,7 +18,9 @@ function RSSFeedInput({ feed_url, setFeedUrl, onResult }: RSSFeedInputProps) {
 		if (!feed_url) return;
 		try {
 			const response = await fetch(feed_url);
-			onResult(await response.text());
+			const rss_string = await response.text()
+			const rss = parser.parse(rss_string).rss
+			onResult(rss);
 		} catch (err) {
 			console.error(err);
 		}
