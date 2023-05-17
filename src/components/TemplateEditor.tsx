@@ -53,7 +53,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 		setTimeout(() => {
 			if (textareaRef.current) {
 				textareaRef.current.selectionStart =
-					textareaRef.current.selectionEnd = position + insertValue.length;
+				textareaRef.current.selectionEnd = position + insertValue.length;
 			}
 		}, 0);
 	};
@@ -71,11 +71,11 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 				<textarea value={value} onChange={e => setValue(e.target.value)} ref={textareaRef} />
 			</div>
 			<h3>RSSの内容を追加</h3>
-			<select onChange={handleSelectChange}>
-				<option>--- チャンネル ---</option>
+			<select onChange={handleSelectChange} value={0}>
+				<option>--- 番組情報 ---</option>
 				{elements.filter(e => !e.path.startsWith('item.')).map(option)}
 			</select>
-			<select onChange={handleSelectChange}>
+			<select onChange={handleSelectChange} value={0}>
 				<option>--- エピソード ---</option>
 				{elements.filter(e => e.path.startsWith('item.')).map(option)}
 			</select>
