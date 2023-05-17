@@ -9,6 +9,9 @@ type PreviewProps = {
 
 const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }) => {
 	const [text, setText] = useState('')
+	const [charCount, setCharCount] = useState(0);
+	const urlRegex = /(https?:\/\/[^\s]+)/g;
+
 	useEffect(() => {
 		if (!rss) return;
 
@@ -32,6 +35,12 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 			}
 			text = text.replace(match, value || '');
 		});
+
+		const urlMatches = text.match(urlRegex) || [] as string[];
+		const urlLength = urlMatches.reduce((sum, url) => sum + url.length, 0);
+		const url_in_tweet_size = 23;
+		const adjustedLength = text.length - urlLength + urlMatches.length * url_in_tweet_size;
+		setCharCount(adjustedLength);
 		onChange(text);
 		setText(text)
 	}, [rss, template, item_index, onChange])
@@ -39,6 +48,7 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 	return (
 		<div>
 			<div>{text}</div>
+			<div>文字数: {charCount}</div>
 		</div>
 	);
 };
