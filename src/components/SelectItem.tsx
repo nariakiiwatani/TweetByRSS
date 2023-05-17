@@ -31,9 +31,7 @@ const SelectItem: React.FC<SelectItemProps> = ({ rss, onChange }) => {
 
 	return (
 		<FormControl fullWidth>
-		<InputLabel id="select-episode-label">--- 反映するエピソードを選択 ---</InputLabel>
 		<Select
-			labelId="select-episode-label"
 			onChange={handleChange}
 			defaultValue='0'
 		>

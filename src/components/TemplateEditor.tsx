@@ -73,16 +73,12 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 					onChange={e => setValue(e.target.value)}
 					multiline
 					rows={6}
-					label="Template"
 					variant="outlined"
 					inputRef={textareaRef}
 					fullWidth
 				/>
 			</Grid>
-			<Grid item xs={12} sm={1}>
-				<Typography variant="h4">&#8592;</Typography>
-			</Grid>
-			<Grid item xs={12} sm={5}>
+			<Grid item xs={12} sm={6}>
 				<Typography variant='h6'>RSSから挿入</Typography>
 				<Select
 					onChange={handleSelectChange}
