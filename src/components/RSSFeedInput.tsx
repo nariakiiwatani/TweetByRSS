@@ -1,13 +1,34 @@
-import { RSSFeed } from '../App'
+import { useAsync } from 'react-use';
 
-function RSSFeedInput({ feed, setFeed }: { feed: RSSFeed; setFeed: (feed: RSSFeed) => void }) {
+interface RSSFeedInputProps {
+	feed_url: string;
+	setFeedUrl: (url: string) => void;
+	onResult: (rss: string) => void;
+}
+
+function RSSFeedInput({ feed_url, setFeedUrl, onResult }: RSSFeedInputProps) {
+	const { loading, error } = useAsync(async () => {
+		if (!feed_url) return;
+		try {
+			const response = await fetch(feed_url);
+			onResult(await response.text());
+		} catch (err) {
+			console.error(err);
+		}
+	}, [feed_url, onResult]);
+
 	return (
-		<input
-			type="url"
-			value={feed.url}
-			onChange={(e) => setFeed({ ...feed, url: e.target.value })}
-		/>
+		<div>
+			<input
+				type="url"
+				value={feed_url}
+				onChange={(e) => setFeedUrl(e.target.value)}
+				disabled={loading}
+			/>
+			{loading && <span>Loading...</span>}
+			{error && <span>Error: {error.message}</span>}
+		</div>
 	);
 }
-export default RSSFeedInput
 
+export default RSSFeedInput;
