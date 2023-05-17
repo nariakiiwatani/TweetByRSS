@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Box, Card, CardContent, Typography } from '@mui/material';
 
 type PreviewProps = {
 	template: string;
@@ -10,7 +11,7 @@ type PreviewProps = {
 const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }) => {
 	const [text, setText] = useState('')
 	const [charCount, setCharCount] = useState(0);
-	const urlRegex = /(https?:\/\/[^\s]+)/g;
+	const urlRegex = /(https?:\/\/[^\s\u3000-\u30FF\uFF00-\uFFEF]+)/g;
 
 	useEffect(() => {
 		if (!rss) return;
@@ -25,9 +26,9 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 		matches.forEach((match) => {
 			let value = channel;
 			const path = match.replaceAll('@', '.@').slice(2, -2).split('.');
-			if(path[0] === 'item') {
+			if (path[0] === 'item') {
 				value = value.item[item_index]
-				path.splice(0,1)
+				path.splice(0, 1)
 			}
 			for (const key of path) {
 				value = value[key];
@@ -46,10 +47,14 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 	}, [rss, template, item_index, onChange])
 
 	return (
-		<div>
-			<div>{text}</div>
-			<div>文字数: {charCount}</div>
-		</div>
+	<Box sx={{maxWidth:'50vw'}}>
+		<Card variant="outlined">
+			<CardContent>
+				<Typography variant="body1">{text}</Typography>
+			</CardContent>
+		</Card>
+		<Typography variant="caption" color="textSecondary">Twitter投稿時の文字数(たぶん): {charCount}</Typography>
+	</Box>
 	);
 };
 

@@ -1,5 +1,5 @@
-// SelectItem.tsx
 import React, { useState, useEffect } from 'react';
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 type SelectItemProps = {
 	rss: any;
@@ -23,21 +23,27 @@ const SelectItem: React.FC<SelectItemProps> = ({ rss, onChange }) => {
 		}
 	}, [rss, selectedItemIndex]);
 
-	const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const selectedIndex = Number(e.target.value);
+	const handleChange = (event: SelectChangeEvent<string>) => {
+		const selectedIndex = Number(event.target.value);
 		setSelectedItemIndex(selectedIndex);
 		onChange(selectedIndex);
 	};
 
 	return (
-		<select value={selectedItemIndex} onChange={handleChange}>
+		<FormControl fullWidth>
+		<InputLabel id="select-episode-label">--- 反映するエピソードを選択 ---</InputLabel>
+		<Select
+			labelId="select-episode-label"
+			onChange={handleChange}
+			defaultValue='0'
+		>
 			{channel?.item && channel.item.map((item:any, index:number) => (
-				<option key={index} value={index}>
+				<MenuItem key={index} value={index}>
 					{item.title}
-				</option>
+				</MenuItem>
 			))}
-		</select>
-	);
+		</Select>
+		</FormControl>);
 };
 
 export default SelectItem;

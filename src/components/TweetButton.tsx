@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@mui/material'
 
 type TweetButtonProps = {
 	value: string;
@@ -10,7 +11,17 @@ const TweetButton: React.FC<TweetButtonProps> = ({ value }) => {
 		window.open(url, '_blank');
 	};
 
-	return <button onClick={tweet}>Tweet</button>;
+
+	return (
+		<div>
+			<Button
+				variant='contained'
+				color='primary'
+				onClick={tweet}
+			>ツイート</Button>
+		</div>
+	)
+
 };
 
 export default TweetButton;

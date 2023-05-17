@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { TextField, Grid, Typography } from '@mui/material';
+import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 type TemplateEditorProps = {
 	value: string;
@@ -44,7 +46,8 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 		}
 	}, [rss]);
 
-	const handleButtonClick = (path: string) => {
+	const handleSelectChange = (event: SelectChangeEvent<string>) => {
+		const path = event.target.value
 		const position = textareaRef.current?.selectionStart || 0;
 		const insertValue = `[[${path}]]`
 		const newValue = [value.slice(0, position), insertValue, value.slice(position)].join('');
@@ -53,33 +56,52 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 		setTimeout(() => {
 			if (textareaRef.current) {
 				textareaRef.current.selectionStart =
-				textareaRef.current.selectionEnd = position + insertValue.length;
+					textareaRef.current.selectionEnd = position + insertValue.length;
 			}
 		}, 0);
 	};
-	const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		handleButtonClick(event.target.value);
-	};
 	const option = (element: { path: string, value: any }, index: number) => (
-		<option key={index} value={element.path}>
+		<MenuItem key={index} value={element.path}>
 			{element.path}: {element.value}
-		</option>
+		</MenuItem>
 	)
 	return (
-		<div>
-			<div>
-				<textarea value={value} onChange={e => setValue(e.target.value)} ref={textareaRef} />
-			</div>
-			<h3>RSSの内容を追加</h3>
-			<select onChange={handleSelectChange} value={0}>
-				<option>--- 番組情報 ---</option>
-				{elements.filter(e => !e.path.startsWith('item.')).map(option)}
-			</select>
-			<select onChange={handleSelectChange} value={0}>
-				<option>--- エピソード ---</option>
-				{elements.filter(e => e.path.startsWith('item.')).map(option)}
-			</select>
-		</div>
+		<Grid container spacing={2} alignItems="center" sx={{maxWidth:'100vw'}}>
+			<Grid item xs={12} sm={6}>
+				<TextField
+					value={value}
+					onChange={e => setValue(e.target.value)}
+					multiline
+					rows={6}
+					label="Template"
+					variant="outlined"
+					inputRef={textareaRef}
+					fullWidth
+				/>
+			</Grid>
+			<Grid item xs={12} sm={1}>
+				<Typography variant="h4">&#8592;</Typography>
+			</Grid>
+			<Grid item xs={12} sm={5}>
+				<Typography variant='h6'>RSSから挿入</Typography>
+				<Select
+					onChange={handleSelectChange}
+					value='label'
+					fullWidth
+				>
+					<MenuItem value='label' disabled>--- 番組情報 ---</MenuItem>
+					{elements.filter(e => !e.path.startsWith('item.')).map(option)}
+				</Select>
+				<Select
+					onChange={handleSelectChange}
+					value='label'
+					fullWidth
+				>
+					<MenuItem value='label' disabled>--- エピソード ---</MenuItem>
+					{elements.filter(e => e.path.startsWith('item.')).map(option)}
+				</Select>
+			</Grid>
+		</Grid>
 	);
 };
 

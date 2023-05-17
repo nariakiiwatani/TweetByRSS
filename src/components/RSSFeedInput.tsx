@@ -1,6 +1,7 @@
 import { useAsync } from 'react-use';
 
 import { XMLParser } from 'fast-xml-parser';
+import { TextField, CircularProgress } from '@mui/material';
 
 const parser = new XMLParser({
 	attributeNamePrefix: "@",
@@ -28,13 +29,16 @@ function RSSFeedInput({ feed_url, setFeedUrl, onResult }: RSSFeedInputProps) {
 
 	return (
 		<div>
-			<input
+			<TextField
+				sx={{width: '80%'}}
 				type="url"
 				value={feed_url}
 				onChange={(e) => setFeedUrl(e.target.value)}
 				disabled={loading}
+				label="Feed URL"
+				variant="outlined"
 			/>
-			{loading && <span>Loading...</span>}
+			{loading && <CircularProgress />}
 			{error && <span>Error: {error.message}</span>}
 		</div>
 	);
