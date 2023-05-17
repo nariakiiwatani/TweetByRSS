@@ -2,7 +2,7 @@ import texts from "../i18n"
 import { createContext, useContext, useState, useMemo } from 'react';
 
 const LanguageContext = createContext(
-	{ locale:'ja', changeLanguage:(l:string)=>{} }
+	{ locale:'ja', changeLanguage:(l:string)=>{l} }
 );
 
 export const LanguageProvider = ({ children }:{children:any}) => {
