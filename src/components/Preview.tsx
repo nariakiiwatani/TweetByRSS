@@ -59,7 +59,7 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 	}, [rss, template, item_index, onChange])
 
 	return (
-	<Box sx={{maxWidth:'50vw'}}>
+	<Box sx={{maxWidth:'100vw'}}>
 		<Card variant="outlined">
 			<CardContent>
 				<Typography variant="body1" dangerouslySetInnerHTML={{__html:text}}></Typography>
