@@ -1,20 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { XMLParser } from 'fast-xml-parser';
 
 type TemplateEditorProps = {
 	value: string;
-	rss: string;
+	rss: any;
 	onChange: (value: string) => void;
 };
 
-const parser = new XMLParser({
-	attributeNamePrefix: "@",
-	ignoreAttributes: false
-})
-
-const TemplateEditor: React.FC<TemplateEditorProps> = ({ value, rss, onChange }) => {
+const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss, onChange }) => {
+	const [value, setValue] = useState(propsValue);
 	const [elements, setElements] = useState<string[]>([]);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+	useEffect(() => {
+		if (value !== propsValue) {
+			setValue(propsValue);
+		}
+	}, [propsValue]);
+
+	useEffect(() => {
+		onChange(value);
+	}, [value, onChange]);
 
 	const getElements = (obj: any, path: string = ''): string[] => {
 		return Object.entries(obj)
@@ -30,9 +35,8 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value, rss, onChange })
 	useEffect(() => {
 		if (!rss) return;
 		try {
-			const feedData = parser.parse(rss);
-			const channel = { ...feedData.rss.channel }
-			if(Array.isArray(channel.item)) {
+			const channel = { ...rss.channel }
+			if (Array.isArray(channel.item)) {
 				channel.item = channel.item[0]
 			}
 			setElements(getElements(channel));
@@ -43,13 +47,21 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value, rss, onChange })
 
 	const handleButtonClick = (path: string) => {
 		const position = textareaRef.current?.selectionStart || 0;
-		const newValue = [value.slice(0, position), `[[${path}]]`, value.slice(position)].join('');
-		onChange(newValue);
+		const insertValue = `[[${path}]]`
+		const newValue = [value.slice(0, position), insertValue, value.slice(position)].join('');
+
+		setValue(newValue);
+		setTimeout(() => {
+			if (textareaRef.current) {
+				textareaRef.current.selectionStart = 
+				textareaRef.current.selectionEnd = position + insertValue.length;
+			}
+		}, 0);
 	};
 
 	return (
 		<div>
-			<textarea value={value} onChange={e => onChange(e.target.value)} ref={textareaRef} />
+			<textarea value={value} onChange={e => setValue(e.target.value)} ref={textareaRef} />
 			{elements.map((element, index) => (
 				<button key={index} onClick={() => handleButtonClick(element)}>
 					{element}
