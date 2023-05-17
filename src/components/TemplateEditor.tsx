@@ -8,7 +8,7 @@ type TemplateEditorProps = {
 
 const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss, onChange }) => {
 	const [value, setValue] = useState(propsValue);
-	const [elements, setElements] = useState<string[]>([]);
+	const [elements, setElements] = useState<{ path: string, value: any }[]>([]);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	useEffect(() => {
@@ -21,17 +21,16 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 		onChange(value);
 	}, [value, onChange]);
 
-	const getElements = (obj: any, path: string = ''): string[] => {
+	const getElements = (obj: any, path: string = ''): { path: string, value: any }[] => {
 		return Object.entries(obj)
 			.reduce((elements, [key, value]) => {
 				const newPath = key.startsWith("@") ? `${path}${key}` : path ? `${path}.${key}` : key;
 				if (typeof value === 'object' && value !== null) {
 					return [...elements, ...getElements(value as any, newPath)];
 				}
-				return [...elements, newPath];
-			}, [] as string[]);
+				return [...elements, { path: newPath, value: typeof value === 'object' ? '[object]' : value }];
+			}, [] as { path: string, value: any }[]);
 	};
-
 	useEffect(() => {
 		if (!rss) return;
 		try {
@@ -53,20 +52,33 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 		setValue(newValue);
 		setTimeout(() => {
 			if (textareaRef.current) {
-				textareaRef.current.selectionStart = 
-				textareaRef.current.selectionEnd = position + insertValue.length;
+				textareaRef.current.selectionStart =
+					textareaRef.current.selectionEnd = position + insertValue.length;
 			}
 		}, 0);
 	};
-
+	const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		handleButtonClick(event.target.value);
+	};
+	const option = (element: { path: string, value: any }, index: number) => (
+		<option key={index} value={element.path}>
+			{element.path}: {element.value}
+		</option>
+	)
 	return (
 		<div>
-			<textarea value={value} onChange={e => setValue(e.target.value)} ref={textareaRef} />
-			{elements.map((element, index) => (
-				<button key={index} onClick={() => handleButtonClick(element)}>
-					{element}
-				</button>
-			))}
+			<div>
+				<textarea value={value} onChange={e => setValue(e.target.value)} ref={textareaRef} />
+			</div>
+			<h3>RSSの内容を追加</h3>
+			<select onChange={handleSelectChange}>
+				<option>--- チャンネル ---</option>
+				{elements.filter(e => !e.path.startsWith('item.')).map(option)}
+			</select>
+			<select onChange={handleSelectChange}>
+				<option>--- エピソード ---</option>
+				{elements.filter(e => e.path.startsWith('item.')).map(option)}
+			</select>
 		</div>
 	);
 };
