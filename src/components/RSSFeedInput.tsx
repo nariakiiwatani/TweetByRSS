@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useAsync } from 'react-use'
 import { XMLParser } from 'fast-xml-parser';
 import { TextField, CircularProgress } from '@mui/material';
@@ -45,7 +45,7 @@ function RSSFeedInput({ feed_url:url, setFeedUrl, onResult }: RSSFeedInputProps)
 				}
 			})
 		}
-	}, [url, setLoading, setFeedUrl, setError, onResult, parser])
+	}, [url])
 
 	return (
 		<div>

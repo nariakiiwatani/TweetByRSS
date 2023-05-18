@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 type SelectItemProps = {
+	value: number;
 	rss: any;
 	onChange: (index: number) => void;
 };
 
-const SelectItem: React.FC<SelectItemProps> = ({ rss, onChange }) => {
-	const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+const SelectItem: React.FC<SelectItemProps> = ({ value, rss, onChange }) => {
 	const [channel, setChannel] = useState<any>([]);
 
 	useEffect(() => {
@@ -21,11 +21,10 @@ const SelectItem: React.FC<SelectItemProps> = ({ rss, onChange }) => {
 		} catch (error) {
 			console.error(error);
 		}
-	}, [rss, selectedItemIndex]);
+	}, [rss, setChannel]);
 
 	const handleChange = (event: SelectChangeEvent<string>) => {
 		const selectedIndex = Number(event.target.value);
-		setSelectedItemIndex(selectedIndex);
 		onChange(selectedIndex);
 	};
 
@@ -33,7 +32,7 @@ const SelectItem: React.FC<SelectItemProps> = ({ rss, onChange }) => {
 		<FormControl fullWidth>
 		<Select
 			onChange={handleChange}
-			defaultValue='0'
+			value={`${value}`}
 		>
 			{channel?.item ? channel.item.map((item:any, index:number) => (
 				<MenuItem key={index} value={index}>

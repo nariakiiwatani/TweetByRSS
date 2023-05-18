@@ -7,7 +7,7 @@ import CopyButton from './components/CopyButton';
 import TweetButton from './components/TweetButton';
 import Header from './components/Header'
 
-import { Box, Paper, Typography, Select, MenuItem, SelectChangeEvent, Button, Grid } from '@mui/material'
+import { Box, Paper, Typography, Select, MenuItem, Button, Grid } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -66,17 +66,17 @@ function App() {
 		if(title) {
 			current.set('url', url)
 			record.set(url, prev=>({...prev, title}))
+			const template = record.get(url)?.template
+			if(template) {
+				setTemplate(template)
+			}
+			setEpisodeIndex(0)
 		}
-	}, [current.set, setRSS, record.set])
+	}, [current.set, setRSS, record.set, record.get, setEpisodeIndex])
 
 	const handleSelectRecord = useCallback((url:string) => {
-		current.set('url', url)
 		setFeedUrl(url)
-		const template = record.get(url)?.template
-		if(template) {
-			setTemplate(template)
-		}
-	}, [current.set, setFeedUrl, record.get, setTemplate])
+	}, [setFeedUrl])
 
 	const handleRemoveRecord = useCallback(() => {
 		const url = current.get('url')
@@ -120,7 +120,7 @@ function App() {
 							</Grid>
 							<Grid item xs={12}>
 								<Select fullWidth value={current.get('url')||'label'}>
-									<MenuItem key={'label'} disabled value='label'>---{t.select_channel}---</MenuItem>
+									<MenuItem key={'label'} value='label'>---{t.select_channel}---</MenuItem>
 									{record_items.map(([url,{title}]) => <MenuItem key={url} value={url} onClick={()=>handleSelectRecord(url)}>{title}</MenuItem>)}
 								</Select>
 							</Grid>
@@ -142,7 +142,7 @@ function App() {
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
 					<Typography variant="h5" gutterBottom>{t.select_episode}</Typography>
-					<SelectItem rss={rss} onChange={setEpisodeIndex} />
+					<SelectItem rss={rss} value={episode_index} onChange={setEpisodeIndex} />
 				</Paper>
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
