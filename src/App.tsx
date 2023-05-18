@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import RSSFeedInput from './components/RSSFeedInput';
 import TemplateEditor from './components/TemplateEditor';
 import SelectItem from './components/SelectItem';
@@ -7,7 +7,7 @@ import CopyButton from './components/CopyButton';
 import TweetButton from './components/TweetButton';
 import Header from './components/Header'
 
-import { Box, Paper, Typography, Select, MenuItem, SelectChangeEvent, Button } from '@mui/material'
+import { Box, Paper, Typography, Select, MenuItem, SelectChangeEvent, Button, Grid } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -49,50 +49,43 @@ const useStorage = <T,>(root:string) => {
 }
 
 function App() {
-	const { t } = useTranslation('label')
+	const { t } = useTranslation('index')
 
 	const record = useStorage<{title:string,template:string}>('record')
 	const current = useStorage<string>('current')
 
 	const [feed_url, setFeedUrl] = useState(() => current.get('url') || '');
-	const [is_feed_valid, setIsFeedValid] = useState(false)
 	const [rss, setRSS] = useState<any>(null);
 	const [episode_index, setEpisodeIndex] = useState(0)
 	const [template, setTemplate] = useState(() => record.get(feed_url)?.template || '');
 	const [preview_text, setPreviewText] = useState('');
 
 	const handleRssChange = useCallback((url: string, rss:any) => {
-		if(!rss) {
-			setIsFeedValid(false)
-			return
-		}
-		const {title} = rss.channel
-		current.set('url', url)
 		setRSS(rss)
-		record.set(url, prev=>({...prev, title}))
-		setIsFeedValid(true)
-	}, [current.set, setRSS, setIsFeedValid, record.set])
+		const title = rss?.channel?.title
+		if(title) {
+			current.set('url', url)
+			record.set(url, prev=>({...prev, title}))
+		}
+	}, [current.set, setRSS, record.set])
 
-	const handleSelectRecord = useCallback((event: SelectChangeEvent<string>) => {
-		const url = event.target.value
+	const handleSelectRecord = useCallback((url:string) => {
 		current.set('url', url)
 		setFeedUrl(url)
 		const template = record.get(url)?.template
 		if(template) {
 			setTemplate(template)
 		}
-		setIsFeedValid(true)
 	}, [current.set, setFeedUrl, record.get, setTemplate])
 
 	const handleRemoveRecord = useCallback(() => {
 		const url = current.get('url')
 		current.remove('url')
 		setFeedUrl('')
-		setIsFeedValid(false)
 		if(url) {
 			record.remove(url)
 		}
-	}, [current.get, current.remove, setFeedUrl, setIsFeedValid, record.remove])
+	}, [current.get, current.remove, setFeedUrl, record.remove])
 
 	useEffect(() => {
 		const url = current.get('url')
@@ -101,24 +94,50 @@ function App() {
 		}
 	}, [template, current.get, record.set])
 
+	const record_items = useMemo(() => Object.entries(record.data), [record.data])
+
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<Header />
 			<Box sx={{ margin: 2 }}>
-				<Select value={current.get('url')||'label'} onChange={handleSelectRecord}>
-					<MenuItem disabled value='label'>---select channel---</MenuItem>
-					{Object.entries(record.data).map(([url,{title}]) => <MenuItem value={url}>{title}</MenuItem>)}
-				</Select>
-				{current.get('url') && <Button onClick={handleRemoveRecord}>delete</Button>}
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
-					<Typography variant="h5" gutterBottom>{t.input_rss}</Typography>
-					<RSSFeedInput feed_url={feed_url} setFeedUrl={setFeedUrl} onResult={handleRssChange} />
+					<Grid container spacing={2}>
+						<Grid item xs={12} md={4} container>
+							<Grid item xs={6}>
+								<Typography variant="h5" gutterBottom>
+									{t.select_channel}
+								</Typography>
+							</Grid>
+							<Grid item xs={6}>
+								{current.get('url') && <>
+									<Button
+										variant='contained'
+										color='error'
+										onClick={handleRemoveRecord}
+									>{t.delete_channel}</Button>
+								</>}
+							</Grid>
+							<Grid item xs={12}>
+								<Select fullWidth value={current.get('url')||'label'}>
+									<MenuItem key={'label'} disabled value='label'>---{t.select_channel}---</MenuItem>
+									{record_items.map(([url,{title}]) => <MenuItem key={url} value={url} onClick={()=>handleSelectRecord(url)}>{title}</MenuItem>)}
+								</Select>
+							</Grid>
+						</Grid>
+						<Grid item xs={8} md={6} container>
+							<Grid item xs={12}>
+								<Typography variant="h5" gutterBottom>{t.input_rss}</Typography>
+							</Grid>
+							<Grid item xs={12}>
+								<RSSFeedInput feed_url={feed_url} setFeedUrl={setFeedUrl} onResult={handleRssChange} />
+							</Grid>
+						</Grid>
+					</Grid>
 				</Paper>
-
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
 					<Typography variant="h5" gutterBottom>{t.edit_template}</Typography>
-					<TemplateEditor disabled={!is_feed_valid} value={template} rss={rss} onChange={setTemplate} />
+					<TemplateEditor disabled={!rss} value={template} rss={rss} onChange={setTemplate} />
 				</Paper>
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>

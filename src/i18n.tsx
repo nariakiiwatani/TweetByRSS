@@ -1,5 +1,13 @@
 export default {
-	label: {
+	index: {
+		select_channel: {
+			en: 'Select Channel',
+			ja: '番組を選択'
+		},
+		delete_channel: {
+			en: 'delete',
+			ja: '番組を削除'
+		},
 		input_rss: {
 			en: 'Enter RSS Feed URL',
 			ja: 'RSSフィードのURLを入力'

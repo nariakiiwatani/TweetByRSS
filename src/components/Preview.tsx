@@ -36,16 +36,20 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 		const matches = template.match(/\[\[.*?\]\]/g) || [];
 		matches.forEach((match) => {
 			let value = channel;
-			const path = match.replaceAll('@', '.@').slice(2, -2).split('.');
-			if (path[0] === 'item') {
-				value = value.item[item_index]
-				path.splice(0, 1)
+			try {
+				const path = match.replaceAll('@', '.@').slice(2, -2).split('.');
+				if (path[0] === 'item') {
+					value = value.item[item_index]
+					path.splice(0, 1)
+				}
+				for (const key of path) {
+					value = value[key];
+					if (!value) break;
+				}
+				text = text.replace(match, value || '');
 			}
-			for (const key of path) {
-				value = value[key];
-				if (!value) break;
+			catch(e) {
 			}
-			text = text.replace(match, value || '');
 		});
 
 		onChange(text);

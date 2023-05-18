@@ -35,11 +35,11 @@ const SelectItem: React.FC<SelectItemProps> = ({ rss, onChange }) => {
 			onChange={handleChange}
 			defaultValue='0'
 		>
-			{channel?.item && channel.item.map((item:any, index:number) => (
+			{channel?.item ? channel.item.map((item:any, index:number) => (
 				<MenuItem key={index} value={index}>
 					{item.title}
 				</MenuItem>
-			))}
+			)) : <MenuItem value='0'>---</MenuItem>}
 		</Select>
 		</FormControl>);
 };
