@@ -1,4 +1,4 @@
-import { useAsync } from 'react-use';
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 import { XMLParser } from 'fast-xml-parser';
 import { TextField, CircularProgress } from '@mui/material';
@@ -11,21 +11,44 @@ const parser = new XMLParser({
 interface RSSFeedInputProps {
 	feed_url: string;
 	setFeedUrl: (url: string) => void;
-	onResult: (rss: string) => void;
+	onResult: (url: string, rss: any) => void;
 }
 
 function RSSFeedInput({ feed_url, setFeedUrl, onResult }: RSSFeedInputProps) {
-	const { loading, error } = useAsync(async () => {
-		if (!feed_url) return;
-		try {
-			const response = await fetch(feed_url);
-			const rss_string = await response.text()
-			const rss = parser.parse(rss_string).rss
-			onResult(rss);
-		} catch (err) {
-			console.error(err);
+	const [loading, setLoading] = useState(false)
+	const [error, setError] = useState('')
+	const last_request = useRef('')
+	const handleChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const url = e.target.value
+		last_request.current = url
+		setLoading(true)
+		setFeedUrl(url)
+		setError('')
+		fetch(url)
+		.then(res => res.text())
+		.then(str => parser.parse(str).rss)
+		.then(rss=> {
+			if(last_request.current === url) {
+				onResult(url, rss)
+			}
+		})
+		.catch(e => {
+			if(last_request.current === url) {
+				onResult(url, undefined)
+				setError(e.message)
+			}
+		})
+		.finally(() => {
+			if(last_request.current === url) {
+				setLoading(false)
+			}
+		})
+	}, [parser, setFeedUrl, onResult, setLoading])
+	useEffect(() => {
+		if (feed_url) {
+			handleChange({target:{value:feed_url}} as React.ChangeEvent<HTMLInputElement>)
 		}
-	}, [feed_url, onResult]);
+	}, [])
 
 	return (
 		<div>
@@ -33,13 +56,13 @@ function RSSFeedInput({ feed_url, setFeedUrl, onResult }: RSSFeedInputProps) {
 				sx={{width: '80%'}}
 				type="url"
 				value={feed_url}
-				onChange={(e) => setFeedUrl(e.target.value)}
-				disabled={loading}
+				onChange={handleChange}
 				label="Feed URL"
 				variant="outlined"
+				error={error!==''}
+				helperText={error}
 			/>
 			{loading && <CircularProgress />}
-			{error && <span>Error: {error.message}</span>}
 		</div>
 	);
 }

@@ -23,7 +23,8 @@ const Header = () => {
 						<MenuItem value="en">🇺🇸 English</MenuItem>
 						<MenuItem value="ja">🇯🇵 日本語</MenuItem>
 					</Select>
-				</Box>				<IconButton color="inherit" component={Link} href="https://github.com/nariakiiwatani/TweetByRSS">
+				</Box>
+				<IconButton color="inherit" component={Link} href="https://github.com/nariakiiwatani/TweetByRSS">
 					<GitHubIcon />
 				</IconButton>
 				<IconButton color="inherit" component={Link} href="https://twitter.com/nariakiiwatani">

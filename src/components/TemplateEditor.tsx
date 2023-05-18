@@ -6,10 +6,11 @@ import { useTranslation } from '../hooks/useTranslation'
 type TemplateEditorProps = {
 	value: string;
 	rss: any;
+	disabled?: boolean;
 	onChange: (value: string) => void;
 };
 
-const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss, onChange }) => {
+const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss, disabled, onChange }) => {
 	const { t } = useTranslation('editor')
 	const [value, setValue] = useState(propsValue);
 	const [elements, setElements] = useState<{ path: string, value: any }[]>([]);
@@ -71,6 +72,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 		<Grid container spacing={2} alignItems="center" sx={{maxWidth:'100vw'}}>
 			<Grid item xs={12} sm={6}>
 				<TextField
+					disabled={disabled}
 					value={value}
 					onChange={e => setValue(e.target.value)}
 					multiline
@@ -83,6 +85,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 			<Grid item xs={12} sm={6}>
 				<Typography variant='h6'>{t.insert_from_rss}</Typography>
 				<Select
+					disabled={disabled}
 					onChange={handleSelectChange}
 					value='label'
 					fullWidth
@@ -91,6 +94,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 					{elements.filter(e => !e.path.startsWith('item.')).map(option)}
 				</Select>
 				<Select
+					disabled={disabled}
 					onChange={handleSelectChange}
 					value='label'
 					fullWidth
