@@ -75,8 +75,12 @@ function App() {
 	}, [current.set, setRSS, record.set, record.get, setEpisodeIndex])
 
 	const handleSelectRecord = useCallback((url:string) => {
-		setFeedUrl(url)
-	}, [setFeedUrl])
+		current.set('url', url)
+		if(feed_url !== url) {
+			setRSS(undefined)
+			setFeedUrl(url)
+		}
+	}, [feed_url, current.set, setRSS, setFeedUrl])
 
 	const handleRemoveRecord = useCallback(() => {
 		const url = current.get('url')
