@@ -91,6 +91,11 @@ function App() {
 		if (title) {
 			current.set('url', url)
 			record.set(url, prev => ({ ...prev, title }))
+			let newTemplates = record.get(url)?.template
+			if(!newTemplates) newTemplates = ['']
+			if(!Array.isArray(newTemplates)) newTemplates = [newTemplates]
+			setTemplates(newTemplates)
+			setTemplate(newTemplates[0])
 			setTemplateIndex(0)
 			setEpisodeIndex(0)
 		}
