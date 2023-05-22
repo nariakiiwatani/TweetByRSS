@@ -1,30 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TextField, Grid, Typography } from '@mui/material';
+import { TextField, Grid, Typography, Button } from '@mui/material';
 import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { useTranslation } from '../hooks/useTranslation'
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+
+type TemplateSelectorProps = {
+	index: number
+	length: number
+	onAdd: () => void
+	onRemove: () => void
+	onNext: () => void
+	onPrevious: () => void
+}
+export const TemplateSelector = ({ index, length, onAdd, onRemove, onNext, onPrevious }: TemplateSelectorProps) => {
+	return (<>
+		<Button onClick={onPrevious} variant='text' disabled={index===0}><NavigateBeforeIcon /></Button>
+		<span>{`${index + 1} / ${length}`}</span>
+		<Button onClick={onNext} variant='text' disabled={index>=length-1}><NavigateNextIcon /></Button>
+		<Button onClick={onAdd}><AddCircleOutlineIcon /></Button>
+		{length > 1 && <Button onClick={onRemove} color='error'><HighlightOffIcon /></Button>}
+	</>)
+}
+
+export const useTemplateEditor = (defaultValue: string|(()=>string)) => {
+	const [value, setValue] = useState(defaultValue)
+	return {
+		value,
+		change: setValue
+	}
+}
 
 type TemplateEditorProps = {
 	value: string;
 	rss: any;
 	disabled?: boolean;
 	onChange: (value: string) => void;
+	Selector: React.ReactNode
 };
 
-const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss, disabled, onChange }) => {
+const TemplateEditor: React.FC<TemplateEditorProps> = ({ value, rss, disabled, onChange, Selector }) => {
 	const { t } = useTranslation('editor')
-	const [value, setValue] = useState(propsValue);
 	const [elements, setElements] = useState<{ path: string, value: any }[]>([]);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-	useEffect(() => {
-		if (value !== propsValue) {
-			setValue(propsValue);
-		}
-	}, [propsValue]);
-
-	useEffect(() => {
-		onChange(value);
-	}, [value, onChange]);
 
 	const getElements = (obj: any, path: string = ''): { path: string, value: any }[] => {
 		return Object.entries(obj)
@@ -49,13 +69,13 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 		}
 	}, [rss]);
 
-	const handleSelectChange = (event: SelectChangeEvent<string>) => {
+	const handleInsertSelect = (event: SelectChangeEvent<string>) => {
 		const path = event.target.value
 		const position = textareaRef.current?.selectionStart || 0;
 		const insertValue = `[[${path}]]`
 		const newValue = [value.slice(0, position), insertValue, value.slice(position)].join('');
 
-		setValue(newValue);
+		onChange(newValue);
 		setTimeout(() => {
 			if (textareaRef.current) {
 				textareaRef.current.selectionStart =
@@ -74,19 +94,20 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 				<TextField
 					disabled={disabled}
 					value={value}
-					onChange={e => setValue(e.target.value)}
+					onChange={e => onChange(e.target.value)}
 					multiline
 					rows={6}
 					variant="outlined"
 					inputRef={textareaRef}
 					fullWidth
 				/>
+				{Selector}
 			</Grid>
 			<Grid item xs={12} sm={6}>
 				<Typography variant='h6'>{t.insert_from_rss}</Typography>
 				<Select
 					disabled={disabled}
-					onChange={handleSelectChange}
+					onChange={handleInsertSelect}
 					value='label'
 					fullWidth
 				>
@@ -95,7 +116,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value: propsValue, rss,
 				</Select>
 				<Select
 					disabled={disabled}
-					onChange={handleSelectChange}
+					onChange={handleInsertSelect}
 					value='label'
 					fullWidth
 				>

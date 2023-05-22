@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import RSSFeedInput from './components/RSSFeedInput';
-import TemplateEditor from './components/TemplateEditor';
+import TemplateEditor, { TemplateSelector, useTemplateEditor } from './components/TemplateEditor';
 import SelectItem from './components/SelectItem';
 import Preview from './components/Preview';
 import CopyButton from './components/CopyButton';
@@ -19,25 +19,25 @@ const theme = createTheme({
 	},
 });
 
-const useStorage = <T,>(root:string) => {
-	const [data, setData] = useState<{[key:string]:T}>(()=>JSON.parse(localStorage.getItem(root)??'{}'))
+const useStorage = <T,>(root: string) => {
+	const [data, setData] = useState<{ [key: string]: T }>(() => JSON.parse(localStorage.getItem(root) ?? '{}'))
 	const updateStorage = useCallback(() => {
 		localStorage.setItem(root, JSON.stringify(data))
 	}, [root, data])
 	const get = useCallback((key: string) => {
-		return data[key]??null
+		return data[key] ?? null
 	}, [data])
-	const set = useCallback((key: string, value:T|((t:T)=>T)) => {
-		if(value instanceof Function) {
-			setData(prev => ({...prev, [key]:value(prev[key])}))
+	const set = useCallback((key: string, value: T | ((t: T) => T)) => {
+		if (value instanceof Function) {
+			setData(prev => ({ ...prev, [key]: value(prev[key]) }))
 		}
 		else {
-			setData(prev => ({...prev, [key]:value}))
+			setData(prev => ({ ...prev, [key]: value }))
 		}
 	}, [setData])
 	const remove = useCallback((key: string) => {
 		setData(prev => {
-			const new_data = {...prev}
+			const new_data = { ...prev }
 			delete new_data[key]
 			return new_data
 		})
@@ -45,38 +45,60 @@ const useStorage = <T,>(root:string) => {
 	useEffect(() => {
 		updateStorage()
 	}, [data, updateStorage])
-	return {data, get, set, remove}
+	return { data, get, set, remove }
 }
 
 function App() {
 	const { t } = useTranslation('index')
 
-	const record = useStorage<{title:string,template:string}>('record')
+	const record = useStorage<{ title: string, templates: string[] }>('record');
 	const current = useStorage<string>('current')
 
 	const [feed_url, setFeedUrl] = useState(() => current.get('url') || '');
 	const [rss, setRSS] = useState<any>(null);
+	const [templates, setTemplates] = useState(()=>{
+		const prev = record.get(feed_url)?.templates
+		if(!prev) return []
+		if(!Array.isArray(prev)) return [prev]
+		return prev
+	})
+	const [templateIndex, setTemplateIndex] = useState(0);
+	const { value: template, change: setTemplate } = useTemplateEditor(() => templates[templateIndex])
+
 	const [episode_index, setEpisodeIndex] = useState(0)
-	const [template, setTemplate] = useState(() => record.get(feed_url)?.template || '');
+
+	const handleChangeTemplate = useCallback((value: string) => {
+		setTemplate(value)
+		setTemplates(prev => {
+			const newTemplates = [...prev]
+			newTemplates[templateIndex] = value
+			return newTemplates
+		})
+		const url = current.get('url')
+		if(!url) return
+		record.set(url, prev => {
+			const newTemplates = [...templates]
+			newTemplates[templateIndex] = value
+			return {...prev, templates:newTemplates}
+		})
+	}, [current.get, record.set, setTemplate, setTemplates, templateIndex])
+
 	const [preview_text, setPreviewText] = useState('');
 
-	const handleRssChange = useCallback((url: string, rss:any) => {
+	const handleRssChange = useCallback((url: string, rss: any) => {
 		setRSS(rss)
 		const title = rss?.channel?.title
-		if(title) {
+		if (title) {
 			current.set('url', url)
-			record.set(url, prev=>({...prev, title}))
-			const template = record.get(url)?.template
-			if(template) {
-				setTemplate(template)
-			}
+			record.set(url, prev => ({ ...prev, title }))
+			setTemplateIndex(0)
 			setEpisodeIndex(0)
 		}
 	}, [current.set, setRSS, record.set, record.get, setEpisodeIndex])
 
-	const handleSelectRecord = useCallback((url:string) => {
+	const handleSelectRecord = useCallback((url: string) => {
 		current.set('url', url)
-		if(feed_url !== url) {
+		if (feed_url !== url) {
 			setRSS(undefined)
 			setFeedUrl(url)
 		}
@@ -86,17 +108,48 @@ function App() {
 		const url = current.get('url')
 		current.remove('url')
 		setFeedUrl('')
-		if(url) {
+		if (url) {
 			record.remove(url)
 		}
 	}, [current.get, current.remove, setFeedUrl, record.remove])
 
-	useEffect(() => {
+	const handleAddTemplate = () => {
+		setTemplate('')
+		setTemplates(prev => [...prev, ''])
+		setTemplateIndex(prev => prev+1)
+
 		const url = current.get('url')
-		if(url) {
-			record.set(url, prev=>({...prev, template}))
-		}
-	}, [template, current.get, record.set])
+		if(!url) return
+		record.set(url, prev => ({...prev, templates:[...prev.templates, '']}))
+	}
+	const handleRemoveTemplate = () => {
+		const newTemplates = [...templates]
+		newTemplates.splice(templateIndex, 1)
+		const newTemplateIndex = Math.max(0, Math.min(templateIndex, newTemplates.length-1))
+		setTemplates(newTemplates)
+		setTemplateIndex(newTemplateIndex)
+		setTemplate(newTemplates[newTemplateIndex])
+			
+		const url = current.get('url')
+		if(!url) return
+		record.set(url, prev => {
+			const newTemplates = [...prev.templates]
+			newTemplates.splice(templateIndex, 1)
+			return {...prev, templates:newTemplates}
+		})
+	}
+	const handlePrevTemplate = () => {
+		const newIndex = templateIndex - 1
+		setTemplateIndex(newIndex)
+		setTemplate(templates[newIndex])
+		setTemplateIndex(newIndex)
+	}
+	const handleNextTemplate = () => {
+		const newIndex = templateIndex + 1
+		setTemplateIndex(newIndex)
+		setTemplate(templates[newIndex])
+		setTemplateIndex(newIndex)
+	}
 
 	const record_items = useMemo(() => Object.entries(record.data), [record.data])
 
@@ -123,9 +176,9 @@ function App() {
 								</>}
 							</Grid>
 							<Grid item xs={12}>
-								<Select fullWidth value={current.get('url')||'label'}>
+								<Select fullWidth value={current.get('url') || 'label'}>
 									<MenuItem key={'label'} value='label'>---{t.select_channel}---</MenuItem>
-									{record_items.map(([url,{title}]) => <MenuItem key={url} value={url} onClick={()=>handleSelectRecord(url)}>{title}</MenuItem>)}
+									{record_items.map(([url, { title }]) => <MenuItem key={url} value={url} onClick={() => handleSelectRecord(url)}>{title}</MenuItem>)}
 								</Select>
 							</Grid>
 						</Grid>
@@ -141,8 +194,18 @@ function App() {
 				</Paper>
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
 					<Typography variant="h5" gutterBottom>{t.edit_template}</Typography>
-					<TemplateEditor disabled={!rss} value={template} rss={rss} onChange={setTemplate} />
+					<TemplateEditor disabled={!rss} value={template} rss={rss} onChange={handleChangeTemplate}
+						Selector={
+						<TemplateSelector
+							index={templateIndex}
+							length={templates.length}
+							onAdd={handleAddTemplate}
+							onRemove={handleRemoveTemplate}
+							onPrevious={handlePrevTemplate}
+							onNext={handleNextTemplate}
+						/>} />
 				</Paper>
+				
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
 					<Typography variant="h5" gutterBottom>{t.select_episode}</Typography>
