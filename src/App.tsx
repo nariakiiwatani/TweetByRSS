@@ -7,9 +7,11 @@ import CopyButton from './components/CopyButton';
 import TweetButton from './components/TweetButton';
 import Header from './components/Header'
 
-import { Box, Paper, Typography, Select, MenuItem, Button, Grid } from '@mui/material'
+import { Box, Paper, Typography, Select, MenuItem, Button, Grid, IconButton } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 import { useTranslation } from './hooks/useTranslation'
 
@@ -201,17 +203,21 @@ function App() {
 					</Grid>
 				</Paper>
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
-					<Typography variant="h5" gutterBottom>{t.edit_template}</Typography>
+					<Typography variant="h5" gutterBottom>{t.edit_template}
+						<IconButton color='primary' onClick={handleAddTemplate}><AddCircleOutlineIcon /></IconButton>
+						{templates.length > 1 && <IconButton color='error' onClick={handleRemoveTemplate}><HighlightOffIcon /></IconButton>}
+
+					</Typography>
 					<TemplateEditor disabled={!rss} value={template} rss={rss} onChange={handleChangeTemplate}
 						Selector={
-							<TemplateSelector
-								index={templateIndex}
-								length={templates.length}
-								onAdd={handleAddTemplate}
-								onRemove={handleRemoveTemplate}
-								onPrevious={handlePrevTemplate}
-								onNext={handleNextTemplate}
-							/>} />
+							<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+								<TemplateSelector
+									index={templateIndex}
+									length={templates.length}
+									onPrevious={handlePrevTemplate}
+									onNext={handleNextTemplate}
+								/>
+							</Box>} />
 				</Paper>
 
 

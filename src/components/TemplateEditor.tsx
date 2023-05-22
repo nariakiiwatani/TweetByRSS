@@ -1,28 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TextField, Grid, Typography, Button } from '@mui/material';
+import { TextField, Grid, Typography, Button, Box } from '@mui/material';
 import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { useTranslation } from '../hooks/useTranslation'
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 type TemplateSelectorProps = {
 	index: number
 	length: number
-	onAdd: () => void
-	onRemove: () => void
 	onNext: () => void
 	onPrevious: () => void
 }
-export const TemplateSelector = ({ index, length, onAdd, onRemove, onNext, onPrevious }: TemplateSelectorProps) => {
-	return (<>
-		<Button onClick={onPrevious} variant='text' disabled={index===0}><NavigateBeforeIcon /></Button>
-		<span>{`${index + 1} / ${length}`}</span>
-		<Button onClick={onNext} variant='text' disabled={index>=length-1}><NavigateNextIcon /></Button>
-		<Button onClick={onAdd}><AddCircleOutlineIcon /></Button>
-		{length > 1 && <Button onClick={onRemove} color='error'><HighlightOffIcon /></Button>}
-	</>)
+export const TemplateSelector = ({ index, length, onNext, onPrevious }: TemplateSelectorProps) => {
+	const button_style = {
+		sx: {
+		}
+	}
+	return (<Box>
+		<Button
+			{...button_style}
+			onClick={onPrevious}
+			variant='text'
+			disabled={index===0}
+		><NavigateBeforeIcon /></Button>
+		<span>{`${index + 1}`}</span>
+		<Button
+			{...button_style}
+			onClick={onNext}
+			variant='text'
+			disabled={index>=length-1}
+		><NavigateNextIcon /></Button>
+		<span> of </span>
+		<span>{`${length}`}</span>
+	</Box>)
 }
 
 export const useTemplateEditor = (defaultValue: string|(()=>string)) => {
@@ -89,7 +99,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value, rss, disabled, o
 		</MenuItem>
 	)
 	return (
-		<Grid container spacing={2} alignItems="center" sx={{maxWidth:'100vw'}}>
+		<Grid container spacing={2} alignItems="flex-start" sx={{maxWidth:'100vw'}}>
 			<Grid item xs={12} sm={6}>
 				<TextField
 					disabled={disabled}
@@ -104,7 +114,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ value, rss, disabled, o
 				{Selector}
 			</Grid>
 			<Grid item xs={12} sm={6}>
-				<Typography variant='h6'>{t.insert_from_rss}</Typography>
+				<Typography variant='h6' gutterBottom>{t.insert_from_rss}</Typography>
 				<Select
 					disabled={disabled}
 					onChange={handleInsertSelect}
