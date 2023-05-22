@@ -1,4 +1,4 @@
-# [TweetByRSS](https://nariakiiwatani.github.io/TweetByRSS/): ポッドキャスト共有ツール
+# [TweetPodcast](https://tweetpodcast.online/): RSSからツイートを作成
 
 ![Screenshot](https://github.com/nariakiiwatani/TweetByRSS/assets/1306139/66d8f8a8-32c9-4b65-baec-8762e1e437a7)
 

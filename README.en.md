@@ -1,4 +1,4 @@
-# [TweetByRSS](https://nariakiiwatani.github.io/TweetByRSS/): Podcast Sharing Tool
+# [TweetPodcast](https://tweetpodcast.online/): Make a tweet from RSS feed
 
 ![Screenshot](https://github.com/nariakiiwatani/TweetByRSS/assets/1306139/095a7232-2018-47f6-94d2-ec65ad7f586b)
 

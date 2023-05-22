@@ -5,16 +5,18 @@ import { useTranslation } from '../hooks/useTranslation'
 
 
 const Header = () => {
-	const {locale, changeLanguage} = useTranslation()
+	const { locale, changeLanguage } = useTranslation()
 	const handleChangeLanguage = (event: SelectChangeEvent<string>) => {
 		changeLanguage(event.target.value)
 	}
 	return (
 		<AppBar position="static">
 			<Toolbar>
-				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-					Make Tweet From RSS
-				</Typography>
+				<Link href={window.origin} sx={{ flexGrow: 1 }}>
+					<Typography color='white' variant="h6" component="div">
+						TweetPodcast.online
+					</Typography>
+				</Link>
 				<Box>
 					<Select
 						value={locale}
