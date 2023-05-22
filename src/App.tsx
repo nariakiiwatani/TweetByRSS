@@ -51,14 +51,14 @@ const useStorage = <T,>(root: string) => {
 function App() {
 	const { t } = useTranslation('index')
 
-	const record = useStorage<{ title: string, templates: string[] }>('record');
+	const record = useStorage<{ title: string, template: string[] }>('record');
 	const current = useStorage<string>('current')
 
 	const [feed_url, setFeedUrl] = useState(() => current.get('url') || '');
 	const [rss, setRSS] = useState<any>(null);
 	const [templates, setTemplates] = useState(()=>{
-		const prev = record.get(feed_url)?.templates
-		if(!prev) return []
+		const prev = record.get(feed_url)?.template
+		if(!prev) return ['']
 		if(!Array.isArray(prev)) return [prev]
 		return prev
 	})
@@ -79,7 +79,7 @@ function App() {
 		record.set(url, prev => {
 			const newTemplates = [...templates]
 			newTemplates[templateIndex] = value
-			return {...prev, templates:newTemplates}
+			return {...prev, template:newTemplates}
 		})
 	}, [current.get, record.set, setTemplate, setTemplates, templateIndex])
 
@@ -120,7 +120,7 @@ function App() {
 
 		const url = current.get('url')
 		if(!url) return
-		record.set(url, prev => ({...prev, templates:[...prev.templates, '']}))
+		record.set(url, prev => ({...prev, template:[...prev.template, '']}))
 	}
 	const handleRemoveTemplate = () => {
 		const newTemplates = [...templates]
@@ -133,9 +133,9 @@ function App() {
 		const url = current.get('url')
 		if(!url) return
 		record.set(url, prev => {
-			const newTemplates = [...prev.templates]
+			const newTemplates = [...prev.template]
 			newTemplates.splice(templateIndex, 1)
-			return {...prev, templates:newTemplates}
+			return {...prev, template:newTemplates}
 		})
 	}
 	const handlePrevTemplate = () => {
