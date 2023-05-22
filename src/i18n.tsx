@@ -27,6 +27,10 @@ export default {
 		confirm_delete: {
 			en: 'Are you sure you want to delete this template?',
 			ja: '本当にこのテンプレートを削除しますか？'
+		},
+		remove_tags: {
+			en: 'Remove HTML Tags',
+			ja: 'HTMLタグを除外'
 		}
 	},
 	editor: {

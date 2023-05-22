@@ -11,14 +11,22 @@ function escapeHtml(unsafe: string) {
          .replace(/'/g, "&#039;");
 }
 
+function stripHtmlTags(str: string) {
+    if (str==='') {
+        return '';
+	}
+    return str.replace(/<[^>]*>/g, '');
+}
+
 type PreviewProps = {
 	template: string;
 	rss: any;
 	item_index: number;
+	remove_html_tags: boolean
 	onChange: (value: string) => void;
 };
 
-const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }) => {
+const Preview: React.FC<PreviewProps> = ({ template, rss, item_index,  remove_html_tags, onChange }) => {
 	const { t } = useTranslation('preview')
 	const [text, setText] = useState('')
 	const [charCount, setCharCount] = useState(0);
@@ -53,6 +61,9 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 			}
 		});
 
+		if(remove_html_tags) {
+			text = stripHtmlTags(text)
+		}
 		onChange(text);
 
 		text = escapeHtml(text);
@@ -64,7 +75,7 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 		const url_in_tweet_size = 23;
 		const adjustedLength = text.length - urlLength + urlMatches.length * url_in_tweet_size;
 		setCharCount(adjustedLength);
-	}, [rss, template, item_index, onChange])
+	}, [rss, template, item_index, remove_html_tags, onChange])
 
 	return (
 	<Box sx={{maxWidth:'100vw'}}>

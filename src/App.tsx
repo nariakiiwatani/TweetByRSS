@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, ChangeEvent } from 'react';
 import RSSFeedInput from './components/RSSFeedInput';
 import TemplateEditor, { TemplateSelector, useTemplateEditor } from './components/TemplateEditor';
 import SelectItem from './components/SelectItem';
@@ -7,7 +7,7 @@ import CopyButton from './components/CopyButton';
 import TweetButton from './components/TweetButton';
 import Header from './components/Header'
 
-import { Box, Paper, Typography, Select, MenuItem, Button, Grid, IconButton } from '@mui/material'
+import { Box, Paper, Typography, Select, MenuItem, Button, Grid, IconButton, Checkbox, FormControlLabel } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -66,7 +66,6 @@ function App() {
 	})
 	const [templateIndex, setTemplateIndex] = useState(0);
 	const { value: template, change: setTemplate } = useTemplateEditor(() => templates[templateIndex])
-
 	const [episode_index, setEpisodeIndex] = useState(0)
 
 	const handleChangeTemplate = useCallback((value: string) => {
@@ -161,6 +160,11 @@ function App() {
 		setTemplateIndex(newIndex)
 	}
 
+	const [remove_html_tags, setRemoveHTMLTags] = useState(false)
+	const handleChangeRemoveHTMLTags = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		setRemoveHTMLTags(e.target.checked)
+	}, [setRemoveHTMLTags])
+
 	const record_items = useMemo(() => Object.entries(record.data), [record.data])
 
 	return (
@@ -220,15 +224,30 @@ function App() {
 							</Box>} />
 				</Paper>
 
-
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
 					<Typography variant="h5" gutterBottom>{t.select_episode}</Typography>
 					<SelectItem rss={rss} value={episode_index} onChange={setEpisodeIndex} />
 				</Paper>
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
-					<Typography variant="h5" gutterBottom>{t.preview}</Typography>
-					<Preview template={template} rss={rss} item_index={episode_index} onChange={setPreviewText} />
+					<Box sx={{display:'flex', alignItems:'center'}}>
+					<Typography variant="h5" gutterBottom>
+						{t.preview}
+						</Typography>
+						<FormControlLabel
+							control={
+								<Checkbox
+									value={remove_html_tags}
+									onChange={handleChangeRemoveHTMLTags}
+								/>
+							}
+							label={t.remove_tags}
+							sx={{
+								marginLeft: 1
+							}}
+						/>
+						</Box>
+					<Preview template={template} rss={rss} item_index={episode_index} remove_html_tags={remove_html_tags} onChange={setPreviewText} />
 					<CopyButton value={preview_text} />
 				</Paper>
 
