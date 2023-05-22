@@ -26,6 +26,7 @@ const Preview: React.FC<PreviewProps> = ({ template, rss, item_index, onChange }
 
 	useEffect(() => {
 		if (!rss) return;
+		if (!template) return;
 
 		const channel = { ...rss.channel }
 		if (channel.item && !Array.isArray(channel.item)) {
