@@ -56,10 +56,10 @@ function App() {
 
 	const [feed_url, setFeedUrl] = useState(() => current.get('url') || '');
 	const [rss, setRSS] = useState<any>(null);
-	const [templates, setTemplates] = useState(()=>{
+	const [templates, setTemplates] = useState(() => {
 		const prev = record.get(feed_url)?.template
-		if(!prev) return ['']
-		if(!Array.isArray(prev)) return [prev]
+		if (!prev) return ['']
+		if (!Array.isArray(prev)) return [prev]
 		return prev
 	})
 	const [templateIndex, setTemplateIndex] = useState(0);
@@ -75,11 +75,11 @@ function App() {
 			return newTemplates
 		})
 		const url = current.get('url')
-		if(!url) return
+		if (!url) return
 		record.set(url, prev => {
 			const newTemplates = [...templates]
 			newTemplates[templateIndex] = value
-			return {...prev, template:newTemplates}
+			return { ...prev, template: newTemplates }
 		})
 	}, [current.get, record.set, setTemplate, setTemplates, templateIndex])
 
@@ -92,8 +92,8 @@ function App() {
 			current.set('url', url)
 			record.set(url, prev => ({ ...prev, title }))
 			let newTemplates = record.get(url)?.template
-			if(!newTemplates) newTemplates = ['']
-			if(!Array.isArray(newTemplates)) newTemplates = [newTemplates]
+			if (!newTemplates) newTemplates = ['']
+			if (!Array.isArray(newTemplates)) newTemplates = [newTemplates]
 			setTemplates(newTemplates)
 			setTemplate(newTemplates[0])
 			setTemplateIndex(0)
@@ -121,26 +121,29 @@ function App() {
 	const handleAddTemplate = () => {
 		setTemplate('')
 		setTemplates(prev => [...prev, ''])
-		setTemplateIndex(prev => prev+1)
+		setTemplateIndex(prev => prev + 1)
 
 		const url = current.get('url')
-		if(!url) return
-		record.set(url, prev => ({...prev, template:[...prev.template, '']}))
+		if (!url) return
+		record.set(url, prev => ({ ...prev, template: [...prev.template, ''] }))
 	}
 	const handleRemoveTemplate = () => {
+		if (template !== '' && !window.confirm(t.confirm_delete)) {
+			return;
+		}
 		const newTemplates = [...templates]
 		newTemplates.splice(templateIndex, 1)
-		const newTemplateIndex = Math.max(0, Math.min(templateIndex, newTemplates.length-1))
+		const newTemplateIndex = Math.max(0, Math.min(templateIndex, newTemplates.length - 1))
 		setTemplates(newTemplates)
 		setTemplateIndex(newTemplateIndex)
 		setTemplate(newTemplates[newTemplateIndex])
-			
+
 		const url = current.get('url')
-		if(!url) return
+		if (!url) return
 		record.set(url, prev => {
 			const newTemplates = [...prev.template]
 			newTemplates.splice(templateIndex, 1)
-			return {...prev, template:newTemplates}
+			return { ...prev, template: newTemplates }
 		})
 	}
 	const handlePrevTemplate = () => {
@@ -201,16 +204,16 @@ function App() {
 					<Typography variant="h5" gutterBottom>{t.edit_template}</Typography>
 					<TemplateEditor disabled={!rss} value={template} rss={rss} onChange={handleChangeTemplate}
 						Selector={
-						<TemplateSelector
-							index={templateIndex}
-							length={templates.length}
-							onAdd={handleAddTemplate}
-							onRemove={handleRemoveTemplate}
-							onPrevious={handlePrevTemplate}
-							onNext={handleNextTemplate}
-						/>} />
+							<TemplateSelector
+								index={templateIndex}
+								length={templates.length}
+								onAdd={handleAddTemplate}
+								onRemove={handleRemoveTemplate}
+								onPrevious={handlePrevTemplate}
+								onNext={handleNextTemplate}
+							/>} />
 				</Paper>
-				
+
 
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
 					<Typography variant="h5" gutterBottom>{t.select_episode}</Typography>

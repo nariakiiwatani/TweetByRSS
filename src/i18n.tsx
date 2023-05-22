@@ -23,6 +23,10 @@ export default {
 		preview: {
 			en: 'Preview',
 			ja: 'プレビュー'
+		},
+		confirm_delete: {
+			en: 'Are you sure you want to delete this template?',
+			ja: '本当にこのテンプレートを削除しますか？'
 		}
 	},
 	editor: {
