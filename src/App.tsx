@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, ChangeEvent } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import RSSFeedInput from './components/RSSFeedInput';
 import TemplateEditor, { TemplateSelector, useTemplateEditor } from './components/TemplateEditor';
 import SelectItem from './components/SelectItem';
@@ -160,10 +160,12 @@ function App() {
 		setTemplateIndex(newIndex)
 	}
 
-	const [remove_html_tags, setRemoveHTMLTags] = useState(false)
-	const handleChangeRemoveHTMLTags = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-		setRemoveHTMLTags(e.target.checked)
-	}, [setRemoveHTMLTags])
+	const [remove_html_tags, setRemoveHTMLTags] = useState(current.get('remove_tags')==='true')
+	const handleChangeRemoveHTMLTags =(e: React.ChangeEvent<HTMLInputElement>) => {
+		const checked = e.target.checked
+		setRemoveHTMLTags(checked)
+		current.set('remove_tags', checked?'true':'false')
+	}
 
 	const record_items = useMemo(() => Object.entries(record.data), [record.data])
 
@@ -237,7 +239,7 @@ function App() {
 						<FormControlLabel
 							control={
 								<Checkbox
-									value={remove_html_tags}
+									checked={remove_html_tags}
 									onChange={handleChangeRemoveHTMLTags}
 								/>
 							}
