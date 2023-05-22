@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, Box, Link, Typography } from '@mui/material';
 import { useTranslation } from '../hooks/useTranslation';
 
 type CopyButtonProps = {
@@ -27,12 +27,16 @@ const CopyButton: React.FC<CopyButtonProps> = ({ value }) => {
 
 	return (
 		<div>
-			<Button
-				variant='contained'
-				color='secondary'
+			<Box
+				component={Link}
 				onClick={handleCopy}
-				disabled={copyStatus === 'copying'}
-			>{t.button}</Button>
+				sx={{
+					display: 'flex',
+					justifyContent: 'flex-start'
+				}}
+			>
+				<Typography variant="caption" color="textSecondary">{t.button}</Typography>
+			</Box>
 			<Snackbar open={copyStatus === 'copying'} autoHideDuration={6000} onClose={handleClose}>
 				<Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
 					{t.pending}

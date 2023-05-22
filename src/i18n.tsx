@@ -44,6 +44,16 @@ export default {
 			en: 'Tweet',
 			ja: 'ツイート'
 		},
+		reply: {
+			label: {
+				en: 'in reply to (optional)',
+				ja: '返信先ツイート(オプション)'
+			},
+			helper: {
+				en: (id:string|null, error:boolean) => error ? 'This is not an ID or a URL' : id ? `reply to: ${id}` : 'Enter Tweet ID or URL',
+				ja: (id:string|null, error:boolean) => error ? 'IDやURLではないと思われる' : id ? `返信先ID: ${id}` : 'ツイートのURLかIDを入力'
+			}
+		}
 	},
 	preview: {
 		limit: {

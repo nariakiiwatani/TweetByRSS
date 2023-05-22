@@ -220,11 +220,11 @@ function App() {
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
 					<Typography variant="h5" gutterBottom>{t.preview}</Typography>
 					<Preview template={template} rss={rss} item_index={episode_index} onChange={setPreviewText} />
+					<CopyButton value={preview_text} />
 				</Paper>
 
-				<Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+				<Box>
 					<TweetButton value={preview_text} />
-					<CopyButton value={preview_text} />
 				</Box>
 			</Box>
 		</ThemeProvider>
