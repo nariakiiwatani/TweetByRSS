@@ -8,6 +8,11 @@ const parser = new XMLParser({
 	ignoreAttributes: false
 })
 
+const fetch_via_api = (url: string) => {
+	const new_url = `https://publicpodcast.link/.netlify/functions/get_rss?url=${encodeURIComponent(url)}`
+	return fetch(new_url)
+}
+
 interface RSSFeedInputProps {
 	feed_url: string;
 	setFeedUrl: (url: string) => void;
@@ -25,7 +30,7 @@ function RSSFeedInput({ feed_url:url, setFeedUrl, onResult }: RSSFeedInputProps)
 			setLoading(true)
 			setFeedUrl(url)
 			setError('')
-			fetch(url)
+			fetch_via_api(url)
 			.then(res => res.text())
 			.then(str => parser.parse(str).rss)
 			.then(rss=> {
