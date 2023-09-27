@@ -288,7 +288,7 @@ function App() {
 					<TweetButton
 						value={preview_text}
 						auto={auto_goto_tweet_window}
-						target={auto_goto_tweet_window?'_self':'_blank'}
+						target={auto_goto_tweet_window&&templates.length<2 ? '_self' : '_blank'}
 					/>
 				</Box>
 			</Box>
