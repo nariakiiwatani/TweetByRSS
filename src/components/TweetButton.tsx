@@ -54,10 +54,12 @@ const useInReplyToField = () => {
 }
 
 type TweetButtonProps = {
-	value: string;
+	value: string
+	auto?: boolean
+	target?: string
 };
 
-const TweetButton: React.FC<TweetButtonProps> = ({ value }) => {
+const TweetButton: React.FC<TweetButtonProps> = ({ value, auto, target }) => {
 	const { t } = useTranslation('tweet')
 	const { status_id: in_reply_to, Field: InputField } = useInReplyToField()
 
@@ -69,8 +71,14 @@ const TweetButton: React.FC<TweetButtonProps> = ({ value }) => {
 		}).filter(([_k, v]) => v && v !== '')
 			.map(([k, v]) => `${k}=${v}`).join('&')
 		console.info({ url, query })
-		window.open(`${url}?${query}`, '_blank');
+		window.open(`${url}?${query}`, target);
 	};
+
+	useEffect(() => {
+		if(auto) {
+			tweet()
+		}
+	}, [auto])
 
 	return (
 		<div>

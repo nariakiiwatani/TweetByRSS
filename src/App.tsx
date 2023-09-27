@@ -14,6 +14,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 import { useTranslation } from './hooks/useTranslation'
+import { useLocation } from 'react-router-dom'
 
 const theme = createTheme({
 	palette: {
@@ -50,13 +51,29 @@ const useStorage = <T,>(root: string) => {
 	return { data, get, set, remove }
 }
 
+const useQuery = () => {
+	const location = useLocation()
+	const value = useMemo(() => new URLSearchParams(location.search), [location])
+	const get = useCallback((key: string, default_value?:string) => {
+		return value.get(key)??default_value
+	}, [value])
+	return {
+		value,
+		get,
+		has: value.has
+	}
+}
 function App() {
 	const { t } = useTranslation('index')
+
+	const query = useQuery()
+	const is_direct_tweet = query.value.has('direct')
+	const [auto_goto_tweet_window, setAutoTweet] = useState(false)
 
 	const record = useStorage<{ title: string, template: string[] }>('record');
 	const current = useStorage<string>('current')
 
-	const [feed_url, setFeedUrl] = useState(() => current.get('url') || '');
+	const [feed_url, setFeedUrl] = useState(() => query.get('channel') || current.get('url') || '');
 	const [rss, setRSS] = useState<any>(null);
 	const [templates, setTemplates] = useState(() => {
 		const prev = record.get(feed_url)?.template
@@ -85,6 +102,13 @@ function App() {
 	}, [current.get, record.set, setTemplate, setTemplates, templateIndex])
 
 	const [preview_text, setPreviewText] = useState('');
+
+	const handleChangePreviewText = useCallback((value:string) => {
+		setPreviewText(value)
+		if(is_direct_tweet) {
+			setAutoTweet(true)
+		}
+	}, [is_direct_tweet])
 
 	const handleRssChange = useCallback((url: string, rss: any) => {
 		setRSS(rss)
@@ -249,12 +273,16 @@ function App() {
 							}}
 						/>
 						</Box>
-					<Preview template={template} rss={rss} item_index={episode_index} remove_html_tags={remove_html_tags} onChange={setPreviewText} />
+					<Preview template={template} rss={rss} item_index={episode_index} remove_html_tags={remove_html_tags} onChange={handleChangePreviewText} />
 					<CopyButton value={preview_text} />
 				</Paper>
 
 				<Box>
-					<TweetButton value={preview_text} />
+					<TweetButton
+						value={preview_text}
+						auto={auto_goto_tweet_window}
+						target={auto_goto_tweet_window?'_self':'_blank'}
+					/>
 				</Box>
 			</Box>
 		</ThemeProvider>
