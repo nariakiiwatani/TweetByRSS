@@ -85,6 +85,10 @@ function App() {
 	const { value: template, change: setTemplate } = useTemplateEditor(() => templates[templateIndex])
 	const [episode_index, setEpisodeIndex] = useState(0)
 
+	const direct_tweet_url = useMemo(() => {
+		return `${window.location.origin}?channel=${encodeURIComponent(feed_url)}&direct`
+	}, [feed_url])
+
 	const handleChangeTemplate = useCallback((value: string) => {
 		setTemplate(value)
 		setTemplates(prev => {
@@ -230,6 +234,9 @@ function App() {
 								<RSSFeedInput feed_url={feed_url} setFeedUrl={setFeedUrl} onResult={handleRssChange} />
 							</Grid>
 						</Grid>
+						<Grid item xs={12}>
+							<CopyButton value={direct_tweet_url} text={t.copy_direct_url} />
+						</Grid>
 					</Grid>
 				</Paper>
 				<Paper elevation={2} sx={{ padding: 2, marginBottom: 2 }}>
@@ -274,7 +281,7 @@ function App() {
 						/>
 						</Box>
 					<Preview template={template} rss={rss} item_index={episode_index} remove_html_tags={remove_html_tags} onChange={handleChangePreviewText} />
-					<CopyButton value={preview_text} />
+					<CopyButton value={preview_text} text={t.copy_to_clipboard} />
 				</Paper>
 
 				<Box>

@@ -31,7 +31,15 @@ export default {
 		remove_tags: {
 			en: 'Remove HTML Tags',
 			ja: 'HTMLタグを除外'
-		}
+		},
+		copy_to_clipboard: {
+			en: 'Copy to Clipboard',
+			ja: 'クリップボードにコピー'
+		},
+		copy_direct_url: {
+			en: 'Copy URL for direct tweet',
+			ja: '最新エピソードをツイートするショートカットURLをコピー'
+		},
 	},
 	editor: {
 		insert_from_rss: {
@@ -67,13 +75,9 @@ export default {
 		limit: {
 			en: 'Characters in Twitter posts (probably)',
 			ja: 'Twitter投稿時の文字数(たぶん)'
-		}
+		},
 	},
 	copy: {
-		button: {
-			en: 'Copy to Clipboard',
-			ja: 'クリップボードにコピー'
-		},
 		pending: {
 			en: 'Copying to clipboard...',
 			ja: 'クリップボードにコピー中...'

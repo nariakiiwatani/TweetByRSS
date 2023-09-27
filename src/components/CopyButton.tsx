@@ -3,10 +3,11 @@ import { Snackbar, Alert, Box, Link, Typography } from '@mui/material';
 import { useTranslation } from '../hooks/useTranslation';
 
 type CopyButtonProps = {
-	value: string;
+	value: string
+	text: string
 };
 
-const CopyButton: React.FC<CopyButtonProps> = ({ value }) => {
+const CopyButton: React.FC<CopyButtonProps> = ({ value, text }) => {
 	const { t } = useTranslation('copy')
 	const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'completed' | 'error'>('idle');
 
@@ -32,10 +33,11 @@ const CopyButton: React.FC<CopyButtonProps> = ({ value }) => {
 				onClick={handleCopy}
 				sx={{
 					display: 'flex',
-					justifyContent: 'flex-start'
+					justifyContent: 'flex-start',
+					cursor: 'pointer'
 				}}
 			>
-				<Typography variant="caption" color="textSecondary">{t.button}</Typography>
+				<Typography variant="caption" color="textSecondary">{text}</Typography>
 			</Box>
 			<Snackbar open={copyStatus === 'copying'} autoHideDuration={6000} onClose={handleClose}>
 				<Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
